@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi Profil Widyaiswara - Kementerian Dalam Negeri</title>
-  <!-- TailWind CSS via CDN -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js untuk Grafik Dashboard -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,8 +15,16 @@
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col">
 
+  <!-- INDIKATOR LOADING OVERLAY -->
+  <div id="loading-spinner" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div class="bg-white p-5 rounded-xl shadow-lg flex items-center gap-3">
+      <i class="fa-solid fa-circle-notch fa-spin text-blue-900 text-2xl"></i>
+      <span class="text-sm font-medium text-slate-700" id="loading-text">Memproses Data...</span>
+    </div>
+  </div>
+
   <!-- HEADER / NAVBAR -->
-  <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+  <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
       <div class="flex items-center space-x-3">
         <div class="bg-yellow-500 p-2 rounded-lg text-blue-950 font-bold text-xl">
@@ -27,18 +35,18 @@
           <p class="text-xs text-blue-200">Kementerian Dalam Negeri Republik Indonesia</p>
         </div>
       </div>
-      <!-- Navigasi Menu -->
+      <!-- Navigasi Menu Utama -->
       <nav class="flex space-x-1 mt-2 sm:mt-0 text-sm font-medium">
-        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active">
+        <button type="button" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active">
           <i class="fa-solid fa-chart-pie mr-1"></i> Dashboard
         </button>
-        <button onclick="switchTab('kuesioner')" id="nav-kuesioner" class="nav-btn">
+        <button type="button" onclick="switchTab('kuesioner')" id="nav-kuesioner" class="nav-btn">
           <i class="fa-solid fa-pen-to-square mr-1"></i> Form Data
         </button>
-        <button onclick="switchTab('direktori')" id="nav-direktori" class="nav-btn">
+        <button type="button" onclick="switchTab('direktori')" id="nav-direktori" class="nav-btn">
           <i class="fa-solid fa-address-book mr-1"></i> Direktori WI
         </button>
-        <button onclick="switchTab('bahan-ajar')" id="nav-bahan-ajar" class="nav-btn">
+        <button type="button" onclick="switchTab('bahan-ajar')" id="nav-bahan-ajar" class="nav-btn">
           <i class="fa-solid fa-book-open mr-1"></i> Bahan Ajar
         </button>
       </nav>
@@ -48,6 +56,9 @@
   <!-- KONTEN UTAMA -->
   <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
 
+    <!-- ALERT NOTIFIKASI -->
+    <div id="alert-container" class="hidden mb-4 p-4 rounded-lg text-sm font-medium transition-all"></div>
+
     <!-- 1. DASHBOARD UTAMA -->
     <section id="page-dashboard" class="tab-content">
       <div class="mb-6 flex justify-between items-center">
@@ -55,7 +66,7 @@
           <h2 class="text-2xl font-bold text-slate-800">Dashboard Ringkasan</h2>
           <p class="text-slate-500 text-sm">Overview statistik demografi Widyaiswara Kemendagri</p>
         </div>
-        <button onclick="loadAllData()" class="bg-blue-800 text-white px-3 py-1.5 rounded hover:bg-blue-900 text-sm flex items-center gap-2">
+        <button type="button" onclick="loadAllData()" class="bg-blue-800 text-white px-3 py-1.5 rounded hover:bg-blue-900 text-sm flex items-center gap-2">
           <i class="fa-solid fa-rotate"></i> Refresh Data
         </button>
       </div>
@@ -123,26 +134,26 @@
         </div>
 
         <!-- FORM 1: PROFIL UTAMA -->
-        <form id="formWidyaiswara" class="subform-content space-y-4">
+        <form id="formWidyaiswara" onsubmit="handleFormSubmit(event, 'widyaiswara')" class="subform-content space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP (18 Digit) *</label>
-              <input type="text" id="inp_NIP" required class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_NIP" name="NIP" required class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
-              <input type="text" id="inp_Nama_Lengkap" required class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Nama_Lengkap" name="Nama_Lengkap" required class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
-              <select id="inp_Jenis_Kelamin" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <select id="inp_Jenis_Kelamin" name="Jenis_Kelamin" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
                 <option value="Laki-Laki">Laki-Laki</option>
                 <option value="Perempuan">Perempuan</option>
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Jenjang Jabatan *</label>
-              <select id="inp_Jenjang_Jabatan" required class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <select id="inp_Jenjang_Jabatan" name="Jenjang_Jabatan" required class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
                 <option value="Ahli Pertama">Ahli Pertama</option>
                 <option value="Ahli Muda">Ahli Muda</option>
                 <option value="Ahli Madya">Ahli Madya</option>
@@ -151,61 +162,61 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Pangkat / Golongan</label>
-              <input type="text" id="inp_Pangkat_Golongan" placeholder="misal: Pembina Utama (IV/e)" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Pangkat_Golongan" name="Pangkat_Golongan" placeholder="misal: Pembina Utama (IV/e)" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Penempatan</label>
-              <select id="inp_Penempatan_Pusat" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <select id="inp_Penempatan_Pusat" name="Penempatan_Pusat" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
                 <option value="Pusat">Pusat</option>
                 <option value="Regional">Regional</option>
               </select>
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Unit Kerja</label>
-              <input type="text" id="inp_Unit_Kerja" placeholder="BPSDM Kemendagri / PPSDM..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Unit_Kerja" name="Unit_Kerja" placeholder="BPSDM Kemendagri / PPSDM..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Email Kemendagri / Aktif</label>
-              <input type="email" id="inp_Email" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="email" id="inp_Email" name="Email" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp</label>
-              <input type="text" id="inp_No_Whatsapp" placeholder="0812..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_No_Whatsapp" name="No_Whatsapp" placeholder="0812..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Rumpun Spesialisasi</label>
-              <input type="text" id="inp_Rumpun_Spesialisasi" placeholder="Pemerintahan Daerah, Keuangan..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Rumpun_Spesialisasi" name="Rumpun_Spesialisasi" placeholder="Pemerintahan Daerah, Keuangan..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Fokus Kompetensi</label>
-            <textarea id="inp_Fokus_Kompetensi" rows="2" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none" placeholder="Sub-keahlian spesifik..."></textarea>
+            <textarea id="inp_Fokus_Kompetensi" name="Fokus_Kompetensi" rows="2" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none" placeholder="Sub-keahlian spesifik..."></textarea>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-t pt-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Pendidikan S1</label>
-              <input type="text" id="inp_Pendidikan_S1" placeholder="Jurusan & Kampus" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Pendidikan_S1" name="Pendidikan_S1" placeholder="Jurusan & Kampus" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Pendidikan S2</label>
-              <input type="text" id="inp_Pendidikan_S2" placeholder="Jurusan & Kampus" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Pendidikan_S2" name="Pendidikan_S2" placeholder="Jurusan & Kampus" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Pendidikan S3</label>
-              <input type="text" id="inp_Pendidikan_S3" placeholder="Jurusan & Kampus" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="text" id="inp_Pendidikan_S3" name="Pendidikan_S3" placeholder="Jurusan & Kampus" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Link Foto Profil (Google Drive / URL)</label>
-              <input type="url" id="inp_Link_Foto_Profil" placeholder="https://..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <input type="url" id="inp_Link_Foto_Profil" name="Link_Foto_Profil" placeholder="https://..." class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Status Keaktifan</label>
-              <select id="inp_Status_Keaktifan" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
+              <select id="inp_Status_Keaktifan" name="Status_Keaktifan" class="w-full border rounded p-2 text-sm focus:ring-2 focus:ring-blue-800 outline-none">
                 <option value="Aktif">Aktif</option>
                 <option value="Tugas Belajar">Tugas Belajar</option>
                 <option value="Pensiun">Pensiun</option>
@@ -219,19 +230,19 @@
         </form>
 
         <!-- FORM 2: KEDIKLATAN -->
-        <form id="formDiklat" class="subform-content hidden space-y-4">
+        <form id="formDiklat" onsubmit="handleFormSubmit(event, 'diklat')" class="subform-content hidden space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
-              <input type="text" id="diklat_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="diklat_NIP" name="NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Diklat *</label>
-              <input type="text" id="diklat_Nama" required placeholder="misal: TOT Pelatihan Kepemimpinan" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="diklat_Nama" name="Nama_Diklat" required placeholder="misal: TOT Pelatihan Kepemimpinan" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Diklat</label>
-              <select id="diklat_Kategori" class="w-full border rounded p-2 text-sm outline-none">
+              <select id="diklat_Kategori" name="Kategori" class="w-full border rounded p-2 text-sm outline-none">
                 <option value="Diklat Substantif">Diklat Substantif</option>
                 <option value="Diklat Fungsional">Diklat Fungsional</option>
                 <option value="Diklat Teknis">Diklat Teknis</option>
@@ -240,69 +251,69 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Penyelenggara</label>
-              <input type="text" id="diklat_Penyelenggara" placeholder="BPSDM Kemendagri / LAN RI" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="diklat_Penyelenggara" name="Penyelenggara" placeholder="BPSDM Kemendagri / LAN RI" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Lulus</label>
-              <input type="number" id="diklat_Tahun" placeholder="2025" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="number" id="diklat_Tahun" name="Tahun" placeholder="2025" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah JP</label>
-              <input type="number" id="diklat_JP" placeholder="45" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="number" id="diklat_JP" name="JP" placeholder="45" class="w-full border rounded p-2 text-sm outline-none">
             </div>
           </div>
           <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
-            Simpan Riwayat Diklat
+            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Riwayat Diklat
           </button>
         </form>
 
-        <!-- FORM 3: PENGERJAAN MENGAJAR -->
-        <form id="formMengajar" class="subform-content hidden space-y-4">
+        <!-- FORM 3: PENGALAMAN MENGAJAR -->
+        <form id="formMengajar" onsubmit="handleFormSubmit(event, 'mengajar')" class="subform-content hidden space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
-              <input type="text" id="ajar_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="ajar_NIP" name="NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pelatihan *</label>
-              <input type="text" id="ajar_Pelatihan" required placeholder="misal: Pelatihan Kepemimpinan Administrator (PKA)" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="ajar_Pelatihan" name="Nama_Pelatihan" required placeholder="misal: Pelatihan Kepemimpinan Administrator (PKA)" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelatihan Diampu</label>
-              <input type="text" id="ajar_MataPelatihan" placeholder="Manajemen Perubahan Sektor Publik" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="ajar_MataPelatihan" name="Mata_Pelatihan" placeholder="Manajemen Perubahan Sektor Publik" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Lokasi / Angkatan</label>
-              <input type="text" id="ajar_Lokasi" placeholder="PPSDM Regional Bandung - Angkatan IV" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="ajar_Lokasi" name="Lokasi" placeholder="PPSDM Regional Bandung - Angkatan IV" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun</label>
-              <input type="number" id="ajar_Tahun" placeholder="2026" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="number" id="ajar_Tahun" name="Tahun" placeholder="2026" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Total JP</label>
-              <input type="number" id="ajar_JP" placeholder="18" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="number" id="ajar_JP" name="JP" placeholder="18" class="w-full border rounded p-2 text-sm outline-none">
             </div>
           </div>
           <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
-            Simpan Pengalaman Mengajar
+            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Pengalaman Mengajar
           </button>
         </form>
 
         <!-- FORM 4: PUBLIKASI -->
-        <form id="formPublikasi" class="subform-content hidden space-y-4">
+        <form id="formPublikasi" onsubmit="handleFormSubmit(event, 'publikasi')" class="subform-content hidden space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
-              <input type="text" id="pub_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="pub_NIP" name="NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Karya / Tulisan *</label>
-              <input type="text" id="pub_Judul" required placeholder="Judul Artikel/Jurnal/Buku" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="pub_Judul" name="Judul" required placeholder="Judul Artikel/Jurnal/Buku" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Publikasi</label>
-              <select id="pub_Jenis" class="w-full border rounded p-2 text-sm outline-none">
+              <select id="pub_Jenis" name="Jenis" class="w-full border rounded p-2 text-sm outline-none">
                 <option value="Jurnal Ilmiah">Jurnal Ilmiah</option>
                 <option value="Buku">Buku</option>
                 <option value="Modul Resmi">Modul Resmi</option>
@@ -311,36 +322,36 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Penerbit / Nama Jurnal</label>
-              <input type="text" id="pub_Penerbit" placeholder="Jurnal Kebijakan Pemerintahan" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="pub_Penerbit" name="Penerbit" placeholder="Jurnal Kebijakan Pemerintahan" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Terbit</label>
-              <input type="number" id="pub_Tahun" placeholder="2025" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="number" id="pub_Tahun" name="Tahun" placeholder="2025" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Link Publikasi (URL)</label>
-              <input type="url" id="pub_Link" placeholder="https://..." class="w-full border rounded p-2 text-sm outline-none">
+              <input type="url" id="pub_Link" name="Link" placeholder="https://..." class="w-full border rounded p-2 text-sm outline-none">
             </div>
           </div>
           <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
-            Simpan Karya / Publikasi
+            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Karya / Publikasi
           </button>
         </form>
 
         <!-- FORM 5: KEAHLIAN LAIN -->
-        <form id="formKeahlian" class="subform-content hidden space-y-4">
+        <form id="formKeahlian" onsubmit="handleFormSubmit(event, 'keahlian')" class="subform-content hidden space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
-              <input type="text" id="khl_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="khl_NIP" name="NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Bidang Keahlian *</label>
-              <input type="text" id="khl_Bidang" required placeholder="misal: Executive Coaching / Master of Ceremony" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="khl_Bidang" name="Bidang_Keahlian" required placeholder="misal: Executive Coaching / Master of Ceremony" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tingkat Kemahiran</label>
-              <select id="khl_Tingkat" class="w-full border rounded p-2 text-sm outline-none">
+              <select id="khl_Tingkat" name="Tingkat" class="w-full border rounded p-2 text-sm outline-none">
                 <option value="Pemula">Pemula</option>
                 <option value="Menengah">Menengah</option>
                 <option value="Ahli (Expert)">Ahli (Expert)</option>
@@ -348,65 +359,65 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan Pendukung</label>
-              <input type="text" id="khl_Ket" placeholder="Sertifikasi ICF..." class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="khl_Ket" name="Keterangan" placeholder="Sertifikasi ICF..." class="w-full border rounded p-2 text-sm outline-none">
             </div>
           </div>
           <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
-            Simpan Keahlian
+            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Keahlian
           </button>
         </form>
 
         <!-- FORM 6: EVALUASI PESERTA -->
-        <form id="formPenilaian" class="subform-content hidden space-y-4">
+        <form id="formPenilaian" onsubmit="handleFormSubmit(event, 'evaluasi')" class="subform-content hidden space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
-              <input type="text" id="evl_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="evl_NIP" name="NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pelatihan *</label>
-              <input type="text" id="evl_Pelatihan" required placeholder="Latsar CPNS Gol III" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="evl_Pelatihan" name="Nama_Pelatihan" required placeholder="Latsar CPNS Gol III" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun / Angkatan</label>
-              <input type="text" id="evl_Tahun" placeholder="2026 - Angkatan I" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="evl_Tahun" name="Tahun_Angkatan" placeholder="2026 - Angkatan I" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Skor Evaluasi (Skala 100 / 5)</label>
-              <input type="text" id="evl_Skor" placeholder="94.5" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="evl_Skor" name="Skor" placeholder="94.5" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Predikat</label>
-              <input type="text" id="evl_Predikat" placeholder="Sangat Memuaskan" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="evl_Predikat" name="Predikat" placeholder="Sangat Memuaskan" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Umpan Balik</label>
-              <input type="text" id="evl_Catatan" placeholder="Materi sangat interaktif" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="evl_Catatan" name="Catatan" placeholder="Materi sangat interaktif" class="w-full border rounded p-2 text-sm outline-none">
             </div>
           </div>
           <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
-            Simpan Penilaian
+            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Penilaian
           </button>
         </form>
 
         <!-- FORM 7: BAHAN AJAR -->
-        <form id="formBahanAjar" class="subform-content hidden space-y-4">
+        <form id="formBahanAjar" onsubmit="handleFormSubmit(event, 'bahan_ajar')" class="subform-content hidden space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
-              <input type="text" id="bhn_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="bhn_NIP" name="NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Bahan Ajar *</label>
-              <input type="text" id="bhn_Judul" required placeholder="Modul / PPT / Video" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="bhn_Judul" name="Judul" required placeholder="Modul / PPT / Video" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelatihan</label>
-              <input type="text" id="bhn_MataPelatihan" placeholder="Perencanaan Strategis" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="text" id="bhn_MataPelatihan" name="Mata_Pelatihan" placeholder="Perencanaan Strategis" class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Bahan</label>
-              <select id="bhn_Jenis" class="w-full border rounded p-2 text-sm outline-none">
+              <select id="bhn_Jenis" name="Jenis_Bahan" class="w-full border rounded p-2 text-sm outline-none">
                 <option value="Modul">Modul</option>
                 <option value="Bahan Tayang (PPT)">Bahan Tayang (PPT)</option>
                 <option value="Video">Video Pembelajaran</option>
@@ -415,15 +426,15 @@
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Link File (Google Drive / URL) *</label>
-              <input type="url" id="bhn_Link" required placeholder="https://..." class="w-full border rounded p-2 text-sm outline-none">
+              <input type="url" id="bhn_Link" name="Link_File" required placeholder="https://..." class="w-full border rounded p-2 text-sm outline-none">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Terbit</label>
-              <input type="number" id="bhn_Tahun" placeholder="2026" class="w-full border rounded p-2 text-sm outline-none">
+              <input type="number" id="bhn_Tahun" name="Tahun" placeholder="2026" class="w-full border rounded p-2 text-sm outline-none">
             </div>
           </div>
           <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
-            Simpan Bahan Ajar
+            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Bahan Ajar
           </button>
         </form>
 
@@ -452,7 +463,7 @@
 
     <!-- 4. DETAIL PROFIL PER ORANG & CETAK -->
     <section id="page-detail" class="tab-content hidden">
-      <button onclick="switchTab('direktori')" class="mb-4 text-blue-900 font-semibold hover:underline text-sm flex items-center gap-2">
+      <button type="button" onclick="switchTab('direktori')" class="mb-4 text-blue-900 font-semibold hover:underline text-sm flex items-center gap-2 print:hidden">
         <i class="fa-solid fa-arrow-left"></i> Kembali ke Direktori
       </button>
 
@@ -463,7 +474,7 @@
           <div class="flex-grow">
             <div class="flex flex-wrap justify-between items-center gap-2">
               <h2 id="detail-nama" class="text-2xl font-bold text-slate-800">Nama Widyaiswara</h2>
-              <button onclick="window.print()" class="bg-slate-800 text-white px-3 py-1.5 rounded text-xs hover:bg-slate-900 print:hidden flex items-center gap-1">
+              <button type="button" onclick="window.print()" class="bg-slate-800 text-white px-3 py-1.5 rounded text-xs hover:bg-slate-900 print:hidden flex items-center gap-1">
                 <i class="fa-solid fa-print"></i> Cetak Profil (PDF)
               </button>
             </div>
@@ -537,7 +548,7 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="bg-blue-950 text-white text-center py-4 text-xs border-t border-blue-900 mt-auto">
+  <footer class="bg-blue-950 text-white text-center py-4 text-xs border-t border-blue-900 mt-auto print:hidden">
     <p>&copy; 2026 Kementerian Dalam Negeri Republik Indonesia. All Rights Reserved.</p>
   </footer>
 
