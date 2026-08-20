@@ -1,1 +1,33 @@
+/* Custom CSS Tambahan */
+.nav-btn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+  color: #bfdbfe;
+}
 
+.nav-btn:hover {
+  background-color: #1e3a8a;
+  color: #ffffff;
+}
+
+.nav-btn.active {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Pengaturan Cetak Profil PDF */
+@media print {
+  body {
+    background: white !important;
+  }
+  header, footer, .nav-btn, button, .print\:hidden {
+    display: none !important;
+  }
+  #printable-profile {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
