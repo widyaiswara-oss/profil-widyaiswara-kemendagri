@@ -1,5 +1,5 @@
 // Konfigurasi Web App URL Google Apps Script Anda
-const SCRIPT_URL = "GANTI_DENGAN_WEB_APP_URL_ANDA";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0yF--8KcOcSgnyLCXF1po6RLisy54uZQMNcU_aNcwoqq-AZAD23CQUzUB4dZKUL7Ehw/exec";
 
 let allWidyaiswara = [];
 let allBahanAjar = [];
