@@ -105,13 +105,25 @@
       </div>
     </section>
 
-    <!-- 2. FORM KUESIONER INPUT DATA -->
+    <!-- 2. FORM KUESIONER INPUT DATA (MULTI-TABEL) -->
     <section id="page-kuesioner" class="tab-content hidden">
-      <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-        <h2 class="text-xl font-bold text-blue-900 mb-1">Form Kuesioner Data Widyaiswara</h2>
-        <p class="text-slate-500 text-sm mb-6">Isi formulir berikut untuk menambahkan data Widyaiswara baru ke database.</p>
+      <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+        <h2 class="text-xl font-bold text-blue-900 mb-1">Form Pengisian Data Widyaiswara</h2>
+        <p class="text-slate-500 text-sm mb-6">Pilih jenis data yang ingin ditambahkan ke database.</p>
 
-        <form id="formWidyaiswara" class="space-y-4">
+        <!-- Sub-Navigasi Form -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b pb-3">
+          <button type="button" onclick="switchFormTab('form-utama')" id="subnav-form-utama" class="subform-btn active">1. Data Profil Utama</button>
+          <button type="button" onclick="switchFormTab('form-diklat')" id="subnav-form-diklat" class="subform-btn">2. Riwayat Kediklatan</button>
+          <button type="button" onclick="switchFormTab('form-mengajar')" id="subnav-form-mengajar" class="subform-btn">3. Pengalaman Mengajar</button>
+          <button type="button" onclick="switchFormTab('form-publikasi')" id="subnav-form-publikasi" class="subform-btn">4. Publikasi</button>
+          <button type="button" onclick="switchFormTab('form-keahlian')" id="subnav-form-keahlian" class="subform-btn">5. Keahlian Lain</button>
+          <button type="button" onclick="switchFormTab('form-penilaian')" id="subnav-form-penilaian" class="subform-btn">6. Evaluasi Peserta</button>
+          <button type="button" onclick="switchFormTab('form-bahan')" id="subnav-form-bahan" class="subform-btn">7. Bahan Ajar</button>
+        </div>
+
+        <!-- FORM 1: PROFIL UTAMA -->
+        <form id="formWidyaiswara" class="subform-content space-y-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">NIP (18 Digit) *</label>
@@ -202,9 +214,219 @@
           </div>
 
           <button type="submit" id="btnSubmitData" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition flex justify-center items-center gap-2">
-            <i class="fa-solid fa-paper-plane"></i> Simpan Data Widyaiswara
+            <i class="fa-solid fa-paper-plane"></i> Simpan Data Utama
           </button>
         </form>
+
+        <!-- FORM 2: KEDIKLATAN -->
+        <form id="formDiklat" class="subform-content hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
+              <input type="text" id="diklat_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Diklat *</label>
+              <input type="text" id="diklat_Nama" required placeholder="misal: TOT Pelatihan Kepemimpinan" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Kategori Diklat</label>
+              <select id="diklat_Kategori" class="w-full border rounded p-2 text-sm outline-none">
+                <option value="Diklat Substantif">Diklat Substantif</option>
+                <option value="Diklat Fungsional">Diklat Fungsional</option>
+                <option value="Diklat Teknis">Diklat Teknis</option>
+                <option value="TOS/TOT">TOS/TOT</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Penyelenggara</label>
+              <input type="text" id="diklat_Penyelenggara" placeholder="BPSDM Kemendagri / LAN RI" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Lulus</label>
+              <input type="number" id="diklat_Tahun" placeholder="2025" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Jumlah JP</label>
+              <input type="number" id="diklat_JP" placeholder="45" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
+            Simpan Riwayat Diklat
+          </button>
+        </form>
+
+        <!-- FORM 3: PENGERJAAN MENGAJAR -->
+        <form id="formMengajar" class="subform-content hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
+              <input type="text" id="ajar_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pelatihan *</label>
+              <input type="text" id="ajar_Pelatihan" required placeholder="misal: Pelatihan Kepemimpinan Administrator (PKA)" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelatihan Diampu</label>
+              <input type="text" id="ajar_MataPelatihan" placeholder="Manajemen Perubahan Sektor Publik" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Lokasi / Angkatan</label>
+              <input type="text" id="ajar_Lokasi" placeholder="PPSDM Regional Bandung - Angkatan IV" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun</label>
+              <input type="number" id="ajar_Tahun" placeholder="2026" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Total JP</label>
+              <input type="number" id="ajar_JP" placeholder="18" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
+            Simpan Pengalaman Mengajar
+          </button>
+        </form>
+
+        <!-- FORM 4: PUBLIKASI -->
+        <form id="formPublikasi" class="subform-content hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
+              <input type="text" id="pub_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Karya / Tulisan *</label>
+              <input type="text" id="pub_Judul" required placeholder="Judul Artikel/Jurnal/Buku" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Publikasi</label>
+              <select id="pub_Jenis" class="w-full border rounded p-2 text-sm outline-none">
+                <option value="Jurnal Ilmiah">Jurnal Ilmiah</option>
+                <option value="Buku">Buku</option>
+                <option value="Modul Resmi">Modul Resmi</option>
+                <option value="Artikel/Opini">Artikel / Opini</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Penerbit / Nama Jurnal</label>
+              <input type="text" id="pub_Penerbit" placeholder="Jurnal Kebijakan Pemerintahan" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Terbit</label>
+              <input type="number" id="pub_Tahun" placeholder="2025" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Link Publikasi (URL)</label>
+              <input type="url" id="pub_Link" placeholder="https://..." class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
+            Simpan Karya / Publikasi
+          </button>
+        </form>
+
+        <!-- FORM 5: KEAHLIAN LAIN -->
+        <form id="formKeahlian" class="subform-content hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
+              <input type="text" id="khl_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Bidang Keahlian *</label>
+              <input type="text" id="khl_Bidang" required placeholder="misal: Executive Coaching / Master of Ceremony" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tingkat Kemahiran</label>
+              <select id="khl_Tingkat" class="w-full border rounded p-2 text-sm outline-none">
+                <option value="Pemula">Pemula</option>
+                <option value="Menengah">Menengah</option>
+                <option value="Ahli (Expert)">Ahli (Expert)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan Pendukung</label>
+              <input type="text" id="khl_Ket" placeholder="Sertifikasi ICF..." class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
+            Simpan Keahlian
+          </button>
+        </form>
+
+        <!-- FORM 6: EVALUASI PESERTA -->
+        <form id="formPenilaian" class="subform-content hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
+              <input type="text" id="evl_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pelatihan *</label>
+              <input type="text" id="evl_Pelatihan" required placeholder="Latsar CPNS Gol III" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun / Angkatan</label>
+              <input type="text" id="evl_Tahun" placeholder="2026 - Angkatan I" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Skor Evaluasi (Skala 100 / 5)</label>
+              <input type="text" id="evl_Skor" placeholder="94.5" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Predikat</label>
+              <input type="text" id="evl_Predikat" placeholder="Sangat Memuaskan" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Umpan Balik</label>
+              <input type="text" id="evl_Catatan" placeholder="Materi sangat interaktif" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
+            Simpan Penilaian
+          </button>
+        </form>
+
+        <!-- FORM 7: BAHAN AJAR -->
+        <form id="formBahanAjar" class="subform-content hidden space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIP Widyaiswara *</label>
+              <input type="text" id="bhn_NIP" required placeholder="Masukkan NIP Widyaiswara" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Bahan Ajar *</label>
+              <input type="text" id="bhn_Judul" required placeholder="Modul / PPT / Video" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelatihan</label>
+              <input type="text" id="bhn_MataPelatihan" placeholder="Perencanaan Strategis" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Bahan</label>
+              <select id="bhn_Jenis" class="w-full border rounded p-2 text-sm outline-none">
+                <option value="Modul">Modul</option>
+                <option value="Bahan Tayang (PPT)">Bahan Tayang (PPT)</option>
+                <option value="Video">Video Pembelajaran</option>
+                <option value="Panduan">Panduan / Petunjuk Teknis</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Link File (Google Drive / URL) *</label>
+              <input type="url" id="bhn_Link" required placeholder="https://..." class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun Terbit</label>
+              <input type="number" id="bhn_Tahun" placeholder="2026" class="w-full border rounded p-2 text-sm outline-none">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-blue-900 text-white font-bold py-2.5 rounded-lg hover:bg-blue-950 transition">
+            Simpan Bahan Ajar
+          </button>
+        </form>
+
       </div>
     </section>
 
