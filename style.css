@@ -2,17 +2,26 @@
    STYLE KUSTOM APLIKASI PROFIL WIDYAISWARA - KEMENDAGRI
    ========================================================================== */
 
-/* Import Font Inter (Opsional untuk tampilan typography yang modern) */
+/* Import Font Inter */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   background-color: #f1f5f9;
   color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* --------------------------------------------------------------------------
-   1. STYLING NAVIGASI UTAMA & SUB-NAVIGASI FORM
+   1. UTILITY CLASSES (PENTING UNTUK JS TAB SWITCHING)
+   -------------------------------------------------------------------------- */
+.hidden {
+  display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. STYLING NAVIGASI UTAMA & SUB-NAVIGASI FORM
    -------------------------------------------------------------------------- */
 
 /* Tombol Navigasi Utama di Header */
@@ -21,6 +30,7 @@ body {
   border-radius: 0.5rem;
   transition: all 0.2s ease-in-out;
   color: #cbd5e1;
+  cursor: pointer;
 }
 
 .nav-btn:hover {
@@ -45,6 +55,7 @@ body {
   color: #475569; /* Slate 600 */
   transition: all 0.2s ease;
   border: 1px solid #cbd5e1;
+  cursor: pointer;
 }
 
 .subform-btn:hover {
@@ -53,14 +64,14 @@ body {
 }
 
 .subform-btn.active {
-  background-color: #0f172a !important; /* Blue 950 / Dark */
+  background-color: #0f172a !important; /* Slate 900 */
   color: #ffffff !important;
   border-color: #0f172a !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* --------------------------------------------------------------------------
-   2. TRANSISI DAN ANIMASI HALAMAN
+   3. TRANSISI DAN ANIMASI HALAMAN
    -------------------------------------------------------------------------- */
 
 .tab-content, .subform-content {
@@ -79,10 +90,11 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   3. KUSTOMISASI FORM & ELEMENT DOKUMEN
+   4. KUSTOMISASI FORM & ELEMENT DOKUMEN
    -------------------------------------------------------------------------- */
 
 input:focus, select:focus, textarea:focus {
+  outline: none; /* Menghilangkan outline bawaan browser */
   border-color: #1e40af;
   box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
 }
@@ -106,17 +118,24 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* --------------------------------------------------------------------------
-   4. STYLING CETAK PDF / WINDOW PRINT (@media print)
+   5. STYLING CETAK PDF / WINDOW PRINT (@media print)
    -------------------------------------------------------------------------- */
 
 @media print {
+  /* Paksa browser mencetak warna latar belakang (background graphic) */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   /* Sembunyikan Navigasi, Header, Footer, dan Tombol saat Mencetak */
-  header, footer, nav, button, .print\:hidden {
+  header, footer, nav, button, .no-print, .print\:hidden {
     display: none !important;
   }
 
   body {
     background-color: #ffffff !important;
+    color: #000000 !important;
     padding: 0 !important;
     margin: 0 !important;
   }
@@ -125,6 +144,7 @@ input:focus, select:focus, textarea:focus {
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
+    width: 100% !important;
   }
 
   #page-detail {
@@ -135,9 +155,15 @@ input:focus, select:focus, textarea:focus {
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+    width: 100% !important;
   }
 
-  /* Penyesuaian Halaman Cetak */
+  /* Cegah potongan elemen di tengah halaman saat print */
+  .card, table, tr, img {
+    page-break-inside: avoid;
+  }
+
+  /* Penyesuaian Halaman Cetak A4 */
   @page {
     size: A4;
     margin: 1.5cm;
