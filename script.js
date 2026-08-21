@@ -132,26 +132,25 @@ function renderCharts() {
   });
 }
 
-// 6. RENDER DIREKTORI WIDYAISWARA
+// 6. RENDER DIREKTORI WIDYAISWARA (Optimasi Rendering DOM)
 function renderDirektori(dataList) {
   const container = document.getElementById('gridWidyaiswara');
-  container.innerHTML = '';
 
-  if (dataList.length === 0) {
+  if (!dataList || dataList.length === 0) {
     container.innerHTML = `<p class="col-span-3 text-center text-slate-500 py-8">Belum ada data Widyaiswara.</p>`;
     return;
   }
 
-  dataList.forEach(item => {
+  const cardsHtml = dataList.map(item => {
     const photoUrl = item.Link_Foto_Profil || 'https://via.placeholder.com/150';
-    const cardHtml = `
+    return `
       <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
         <div class="flex items-center gap-4">
           <img src="${photoUrl}" alt="Foto ${item.Nama_Lengkap}" class="w-16 h-16 rounded-full object-cover border-2 border-blue-900">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm line-clamp-1">${item.Nama_Lengkap}</h3>
-            <p class="text-xs text-slate-500 font-mono">NIP. ${item.NIP}</p>
-            <span class="inline-block mt-1 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">${item.Jenjang_Jabatan}</span>
+            <h3 class="font-bold text-slate-800 text-sm line-clamp-1">${item.Nama_Lengkap || '-'}</h3>
+            <p class="text-xs text-slate-500 font-mono">NIP. ${item.NIP || '-'}</p>
+            <span class="inline-block mt-1 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">${item.Jenjang_Jabatan || '-'}</span>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t text-xs text-slate-600 space-y-1">
@@ -163,16 +162,17 @@ function renderDirektori(dataList) {
         </button>
       </div>
     `;
-    container.innerHTML += cardHtml;
-  });
+  }).join('');
+
+  container.innerHTML = cardsHtml;
 }
 
-// 7. PENCARIAN WIDYAISWARA
+// 7. PENCARIAN WIDYAISWARA (Safety String Check)
 function filterWI() {
   const query = document.getElementById('searchWI').value.toLowerCase();
   const filtered = allWidyaiswara.filter(item => 
     (item.Nama_Lengkap && item.Nama_Lengkap.toLowerCase().includes(query)) ||
-    (item.NIP && item.NIP.includes(query)) ||
+    (item.NIP && String(item.NIP).includes(query)) ||
     (item.Rumpun_Spesialisasi && item.Rumpun_Spesialisasi.toLowerCase().includes(query))
   );
   renderDirektori(filtered);
@@ -204,35 +204,33 @@ function showDetail(nip) {
   switchTab('detail');
 }
 
-// 9. RENDER TABLE BAHAN AJAR
+// 9. RENDER TABLE BAHAN AJAR (Optimasi Rendering DOM)
 function renderBahanAjar(dataList) {
   const tbody = document.getElementById('tableBahanAjarBody');
-  tbody.innerHTML = '';
 
-  if (dataList.length === 0) {
+  if (!dataList || dataList.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Belum ada bahan ajar.</td></tr>`;
     return;
   }
 
-  dataList.forEach(item => {
-    const row = `
-      <tr class="hover:bg-slate-50 border-b">
-        <td class="p-3 font-semibold text-slate-800">${item.Judul_Bahan || '-'}</td>
-        <td class="p-3">${item.Mata_Pelatihan || '-'}</td>
-        <td class="p-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs font-semibold">${item.Jenis_Bahan || '-'}</span></td>
-        <td class="p-3 text-xs font-mono">${item.NIP || '-'}</td>
-        <td class="p-3">
-          <a href="${item.Link_File || '#'}" target="_blank" class="bg-blue-800 text-white px-2.5 py-1 rounded text-xs hover:bg-blue-900 inline-flex items-center gap-1">
-            <i class="fa-solid fa-download"></i> Unduh
-          </a>
-        </td>
-      </tr>
-    `;
-    tbody.innerHTML += row;
-  });
+  const rowsHtml = dataList.map(item => `
+    <tr class="hover:bg-slate-50 border-b">
+      <td class="p-3 font-semibold text-slate-800">${item.Judul_Bahan || '-'}</td>
+      <td class="p-3">${item.Mata_Pelatihan || '-'}</td>
+      <td class="p-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs font-semibold">${item.Jenis_Bahan || '-'}</span></td>
+      <td class="p-3 text-xs font-mono">${item.NIP || '-'}</td>
+      <td class="p-3">
+        <a href="${item.Link_File || '#'}" target="_blank" class="bg-blue-800 text-white px-2.5 py-1 rounded text-xs hover:bg-blue-900 inline-flex items-center gap-1">
+          <i class="fa-solid fa-download"></i> Unduh
+        </a>
+      </td>
+    </tr>
+  `).join('');
+
+  tbody.innerHTML = rowsHtml;
 }
 
-// 10. SETUP HANDLER UNTUK SEMUA FORM SUBMIT
+// 10. SETUP HANDLER UNTUK SEMUA FORM SUBMIT (Fix CORS Header & Loading Button)
 function setupFormHandlers() {
   const forms = [
     { id: 'formWidyaiswara', action: 'addWidyaiswara' },
@@ -251,7 +249,13 @@ function setupFormHandlers() {
     formEl.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const formData = new FormData(formEl);
+      const submitBtn = formEl.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn ? submitBtn.innerText : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Menyimpan...';
+      }
+
       const dataObj = { action: f.action };
 
       // Kumpulkan semua input field dalam form
@@ -266,6 +270,7 @@ function setupFormHandlers() {
       try {
         const res = await fetch(SCRIPT_URL, {
           method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(dataObj)
         });
         const resData = await res.json();
@@ -275,11 +280,16 @@ function setupFormHandlers() {
           formEl.reset();
           loadAllData();
         } else {
-          alert('Gagal menyimpan data: ' + resData.message);
+          alert('Gagal menyimpan data: ' + (resData.message || 'Terjadi kesalahan pada server.'));
         }
       } catch (err) {
         alert('Terjadi kesalahan koneksi saat menyimpan data.');
         console.error(err);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalBtnText;
+        }
       }
     });
   });
