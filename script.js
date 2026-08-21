@@ -4,7 +4,9 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0yF--8KcOcSgnyLCXF
 let allWidyaiswara = [];
 let allBahanAjar = [];
 
-// 1. FUNGSI NAVIGASI TAB UTAMA
+// ==========================================
+// 1. FUNGSI NAVIGASI TAB UTAMA & SUBFORM
+// ==========================================
 function switchTab(tabName) {
   // Sembunyikan semua tab content
   document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -19,7 +21,6 @@ function switchTab(tabName) {
   if (activeNav) activeNav.classList.add('active', 'bg-blue-800');
 }
 
-// 2. FUNGSI NAVIGASI SUB-FORM (MULTI-TABEL)
 function switchFormTab(formId) {
   // Sembunyikan semua sub-form
   document.querySelectorAll('.subform-content').forEach(el => el.classList.add('hidden'));
@@ -41,7 +42,9 @@ function switchFormTab(formId) {
   }
 }
 
-// 3. LOAD DATA DARI GOOGLE APPS SCRIPT
+// ==========================================
+// 2. LOAD & RENDER DATA (GET REQUEST)
+// ==========================================
 async function loadAllData() {
   try {
     const res = await fetch(`${SCRIPT_URL}?action=getAllData`);
@@ -61,25 +64,29 @@ async function loadAllData() {
   }
 }
 
-// 4. UPDATE DASHBOARD STATISTIK
 function updateDashboardStats() {
-  document.getElementById('stat-total-wi').innerText = allWidyaiswara.length;
+  const statTotalWi = document.getElementById('stat-total-wi');
+  if (statTotalWi) statTotalWi.innerText = allWidyaiswara.length;
   
-  const utamaCount = allWidyaiswara.filter(w => w.Jenjang_Jabatan === 'Ahli Utama').length;
-  document.getElementById('stat-utama-wi').innerText = utamaCount;
+  const utamaCount = allWidyaiswara.filter(w => w.Jenjang === 'Ahli Utama' || w.Jenjang_Jabatan === 'Ahli Utama').length;
+  const statUtamaWi = document.getElementById('stat-utama-wi');
+  if (statUtamaWi) statUtamaWi.innerText = utamaCount;
 
-  const pusatCount = allWidyaiswara.filter(w => w.Penempatan_Pusat === 'Pusat').length;
-  document.getElementById('stat-pusat-wi').innerText = pusatCount;
+  const pusatCount = allWidyaiswara.filter(w => w.Penempatan === 'Pusat' || w.Penempatan_Pusat === 'Pusat').length;
+  const statPusatWi = document.getElementById('stat-pusat-wi');
+  if (statPusatWi) statPusatWi.innerText = pusatCount;
 
-  document.getElementById('stat-total-bahan').innerText = allBahanAjar.length;
+  const statTotalBahan = document.getElementById('stat-total-bahan');
+  if (statTotalBahan) statTotalBahan.innerText = allBahanAjar.length;
 }
 
-// 5. RENDER CHART.JS
+// ==========================================
+// 3. GRAFIK (CHART.JS)
+// ==========================================
 let chartJabatanInstance = null;
 let chartPendidikanInstance = null;
 
 function renderCharts() {
-  // Grafik Jenjang Jabatan
   const jabatanCounts = {
     'Ahli Pertama': 0,
     'Ahli Muda': 0,
@@ -88,25 +95,28 @@ function renderCharts() {
   };
 
   allWidyaiswara.forEach(w => {
-    if (jabatanCounts[w.Jenjang_Jabatan] !== undefined) {
-      jabatanCounts[w.Jenjang_Jabatan]++;
+    const jenjang = w.Jenjang || w.Jenjang_Jabatan;
+    if (jabatanCounts[jenjang] !== undefined) {
+      jabatanCounts[jenjang]++;
     }
   });
 
-  const ctxJabatan = document.getElementById('chartJabatan').getContext('2d');
-  if (chartJabatanInstance) chartJabatanInstance.destroy();
-  chartJabatanInstance = new Chart(ctxJabatan, {
-    type: 'pie',
-    data: {
-      labels: Object.keys(jabatanCounts),
-      datasets: [{
-        data: Object.values(jabatanCounts),
-        backgroundColor: ['#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8']
-      }]
-    }
-  });
+  const elemJabatan = document.getElementById('chartJabatan');
+  if (elemJabatan) {
+    const ctxJabatan = elemJabatan.getContext('2d');
+    if (chartJabatanInstance) chartJabatanInstance.destroy();
+    chartJabatanInstance = new Chart(ctxJabatan, {
+      type: 'pie',
+      data: {
+        labels: Object.keys(jabatanCounts),
+        datasets: [{
+          data: Object.values(jabatanCounts),
+          backgroundColor: ['#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8']
+        }]
+      }
+    });
+  }
 
-  // Grafik Pendidikan
   let countS1 = 0, countS2 = 0, countS3 = 0;
   allWidyaiswara.forEach(w => {
     if (w.Pendidikan_S3) countS3++;
@@ -114,27 +124,33 @@ function renderCharts() {
     else if (w.Pendidikan_S1) countS1++;
   });
 
-  const ctxPendidikan = document.getElementById('chartPendidikan').getContext('2d');
-  if (chartPendidikanInstance) chartPendidikanInstance.destroy();
-  chartPendidikanInstance = new Chart(ctxPendidikan, {
-    type: 'bar',
-    data: {
-      labels: ['S1', 'S2', 'S3'],
-      datasets: [{
-        label: 'Jumlah Widyaiswara',
-        data: [countS1, countS2, countS3],
-        backgroundColor: '#f59e0b'
-      }]
-    },
-    options: {
-      scales: { y: { beginAtZero: true } }
-    }
-  });
+  const elemPendidikan = document.getElementById('chartPendidikan');
+  if (elemPendidikan) {
+    const ctxPendidikan = elemPendidikan.getContext('2d');
+    if (chartPendidikanInstance) chartPendidikanInstance.destroy();
+    chartPendidikanInstance = new Chart(ctxPendidikan, {
+      type: 'bar',
+      data: {
+        labels: ['S1', 'S2', 'S3'],
+        datasets: [{
+          label: 'Jumlah Widyaiswara',
+          data: [countS1, countS2, countS3],
+          backgroundColor: '#f59e0b'
+        }]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
 }
 
-// 6. RENDER DIREKTORI WIDYAISWARA (Optimasi Rendering DOM)
+// ==========================================
+// 4. DIREKTORI & DETAIL PROFIL
+// ==========================================
 function renderDirektori(dataList) {
   const container = document.getElementById('gridWidyaiswara');
+  if (!container) return;
 
   if (!dataList || dataList.length === 0) {
     container.innerHTML = `<p class="col-span-3 text-center text-slate-500 py-8">Belum ada data Widyaiswara.</p>`;
@@ -143,19 +159,23 @@ function renderDirektori(dataList) {
 
   const cardsHtml = dataList.map(item => {
     const photoUrl = item.Link_Foto_Profil || 'https://via.placeholder.com/150';
+    const nama = item.Nama || item.Nama_Lengkap || '-';
+    const jenjang = item.Jenjang || item.Jenjang_Jabatan || '-';
+    const kompetensi = item.Kompetensi || item.Rumpun_Spesialisasi || '-';
+
     return `
       <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition">
         <div class="flex items-center gap-4">
-          <img src="${photoUrl}" alt="Foto ${item.Nama_Lengkap}" class="w-16 h-16 rounded-full object-cover border-2 border-blue-900">
+          <img src="${photoUrl}" alt="Foto ${nama}" class="w-16 h-16 rounded-full object-cover border-2 border-blue-900">
           <div>
-            <h3 class="font-bold text-slate-800 text-sm line-clamp-1">${item.Nama_Lengkap || '-'}</h3>
+            <h3 class="font-bold text-slate-800 text-sm line-clamp-1">${nama}</h3>
             <p class="text-xs text-slate-500 font-mono">NIP. ${item.NIP || '-'}</p>
-            <span class="inline-block mt-1 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">${item.Jenjang_Jabatan || '-'}</span>
+            <span class="inline-block mt-1 text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">${jenjang}</span>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t text-xs text-slate-600 space-y-1">
           <p><i class="fa-solid fa-briefcase mr-1.5 text-slate-400"></i> ${item.Unit_Kerja || '-'}</p>
-          <p><i class="fa-solid fa-star mr-1.5 text-slate-400"></i> ${item.Rumpun_Spesialisasi || '-'}</p>
+          <p><i class="fa-solid fa-star mr-1.5 text-slate-400"></i> ${kompetensi}</p>
         </div>
         <button onclick="showDetail('${item.NIP}')" class="w-full mt-4 bg-slate-100 text-blue-900 font-semibold py-1.5 rounded text-xs hover:bg-blue-900 hover:text-white transition">
           Lihat Profil Lengkap
@@ -167,35 +187,31 @@ function renderDirektori(dataList) {
   container.innerHTML = cardsHtml;
 }
 
-// 7. PENCARIAN WIDYAISWARA (Safety String Check)
 function filterWI() {
   const query = document.getElementById('searchWI').value.toLowerCase();
-  const filtered = allWidyaiswara.filter(item => 
-    (item.Nama_Lengkap && item.Nama_Lengkap.toLowerCase().includes(query)) ||
-    (item.NIP && String(item.NIP).includes(query)) ||
-    (item.Rumpun_Spesialisasi && item.Rumpun_Spesialisasi.toLowerCase().includes(query))
-  );
+  const filtered = allWidyaiswara.filter(item => {
+    const nama = (item.Nama || item.Nama_Lengkap || '').toLowerCase();
+    const nip = String(item.NIP || '');
+    const kompetensi = (item.Kompetensi || item.Rumpun_Spesialisasi || '').toLowerCase();
+    return nama.includes(query) || nip.includes(query) || kompetensi.includes(query);
+  });
   renderDirektori(filtered);
 }
 
-// 8. TAMPILKAN DETAIL PROFIL
 function showDetail(nip) {
   const wi = allWidyaiswara.find(w => String(w.NIP) === String(nip));
   if (!wi) return;
 
-  document.getElementById('detail-nama').innerText = wi.Nama_Lengkap || '-';
+  document.getElementById('detail-nama').innerText = wi.Nama || wi.Nama_Lengkap || '-';
   document.getElementById('detail-nip').innerText = `NIP: ${wi.NIP || '-'}`;
-  document.getElementById('detail-jenjang').innerText = wi.Jenjang_Jabatan || '-';
+  document.getElementById('detail-jenjang').innerText = wi.Jenjang || wi.Jenjang_Jabatan || '-';
   document.getElementById('detail-pangkat').innerText = wi.Pangkat_Golongan || '-';
-  document.getElementById('detail-penempatan').innerText = wi.Penempatan_Pusat || '-';
+  document.getElementById('detail-penempatan').innerText = wi.Penempatan || wi.Penempatan_Pusat || '-';
   document.getElementById('detail-unit').innerText = wi.Unit_Kerja || '-';
   document.getElementById('detail-email').innerText = wi.Email || '-';
-  document.getElementById('detail-wa').innerText = wi.No_Whatsapp || '-';
-  document.getElementById('detail-status').innerText = wi.Status_Keaktifan || '-';
-  document.getElementById('detail-s1').innerText = wi.Pendidikan_S1 || '-';
-  document.getElementById('detail-s2').innerText = wi.Pendidikan_S2 || '-';
-  document.getElementById('detail-s3').innerText = wi.Pendidikan_S3 || '-';
-  document.getElementById('detail-kompetensi').innerText = wi.Fokus_Kompetensi || '-';
+  document.getElementById('detail-wa').innerText = wi.No_WA || wi.No_Whatsapp || '-';
+  document.getElementById('detail-status').innerText = wi.Status_Keaktifan || 'Aktif';
+  document.getElementById('detail-kompetensi').innerText = wi.Kompetensi || wi.Fokus_Kompetensi || '-';
 
   if (wi.Link_Foto_Profil) {
     document.getElementById('detail-foto').src = wi.Link_Foto_Profil;
@@ -204,9 +220,9 @@ function showDetail(nip) {
   switchTab('detail');
 }
 
-// 9. RENDER TABLE BAHAN AJAR (Optimasi Rendering DOM)
 function renderBahanAjar(dataList) {
   const tbody = document.getElementById('tableBahanAjarBody');
+  if (!tbody) return;
 
   if (!dataList || dataList.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">Belum ada bahan ajar.</td></tr>`;
@@ -215,7 +231,7 @@ function renderBahanAjar(dataList) {
 
   const rowsHtml = dataList.map(item => `
     <tr class="hover:bg-slate-50 border-b">
-      <td class="p-3 font-semibold text-slate-800">${item.Judul_Bahan || '-'}</td>
+      <td class="p-3 font-semibold text-slate-800">${item.Judul || item.Judul_Bahan || '-'}</td>
       <td class="p-3">${item.Mata_Pelatihan || '-'}</td>
       <td class="p-3"><span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-xs font-semibold">${item.Jenis_Bahan || '-'}</span></td>
       <td class="p-3 text-xs font-mono">${item.NIP || '-'}</td>
@@ -230,73 +246,64 @@ function renderBahanAjar(dataList) {
   tbody.innerHTML = rowsHtml;
 }
 
-// 10. SETUP HANDLER UNTUK SEMUA FORM SUBMIT (Fix CORS Header & Loading Button)
-function setupFormHandlers() {
-  const forms = [
-    { id: 'formWidyaiswara', action: 'addWidyaiswara' },
-    { id: 'formDiklat', action: 'addDiklat' },
-    { id: 'formMengajar', action: 'addMengajar' },
-    { id: 'formPublikasi', action: 'addPublikasi' },
-    { id: 'formKeahlian', action: 'addKeahlian' },
-    { id: 'formPenilaian', action: 'addPenilaian' },
-    { id: 'formBahanAjar', action: 'addBahanAjar' }
-  ];
+// ==========================================
+// 5. PENANGANAN FORM SUBMIT (POST REQUEST)
+// ==========================================
+async function saveFormData(actionType, event) {
+  event.preventDefault();
+  const formEl = event.target;
+  const submitBtn = formEl.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn ? submitBtn.innerText : '';
 
-  forms.forEach(f => {
-    const formEl = document.getElementById(f.id);
-    if (!formEl) return;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Menyimpan...';
+  }
 
-    formEl.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = formEl.querySelector('button[type="submit"]');
-      const originalBtnText = submitBtn ? submitBtn.innerText : '';
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Menyimpan...';
-      }
-
-      const dataObj = { action: f.action };
-
-      // Kumpulkan semua input field dalam form
-      formEl.querySelectorAll('input, select, textarea').forEach(input => {
-        if (input.id) {
-          // Ambil nama kunci dari ID setelah prefix (contoh: inp_NIP -> NIP, diklat_Nama -> Nama)
-          const key = input.id.replace(/^(inp_|diklat_|ajar_|pub_|khl_|evl_|bhn_)/, '');
-          dataObj[key] = input.value;
-        }
-      });
-
-      try {
-        const res = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(dataObj)
-        });
-        const resData = await res.json();
-
-        if (resData.status === 'success') {
-          alert('Data berhasil disimpan!');
-          formEl.reset();
-          loadAllData();
-        } else {
-          alert('Gagal menyimpan data: ' + (resData.message || 'Terjadi kesalahan pada server.'));
-        }
-      } catch (err) {
-        alert('Terjadi kesalahan koneksi saat menyimpan data.');
-        console.error(err);
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerText = originalBtnText;
-        }
-      }
-    });
+  // Ekstrak data otomatis dari atribut 'name' setiap field
+  const formData = new FormData(formEl);
+  const payload = {};
+  formData.forEach((value, key) => {
+    payload[key] = value;
   });
+
+  const requestBody = {
+    action: actionType,
+    payload: payload
+  };
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(requestBody)
+    });
+    const resData = await res.json();
+
+    if (resData.status === 'success') {
+      alert('Data berhasil disimpan ke Google Sheet!');
+      formEl.reset();
+      loadAllData();
+    } else {
+      alert('Gagal menyimpan data: ' + (resData.message || 'Terjadi kesalahan di server.'));
+    }
+  } catch (err) {
+    alert('Terjadi kesalahan koneksi saat mengirim data.');
+    console.error(err);
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerText = originalBtnText;
+    }
+  }
 }
 
-// INITIALIZATION Saat Halaman Dimuat
+// Global Export agar fungsi saveFormData dipanggil sempurna dari HTML
+window.saveFormData = saveFormData;
+
+// ==========================================
+// 6. INITIALIZATION
+// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-  setupFormHandlers();
   loadAllData();
 });
